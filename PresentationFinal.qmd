@@ -1,0 +1,167 @@
+---
+title: "Presentation: Data Science Final Paper"
+author: Kshitij Kshitij
+date: 13 June 2024
+
+format: revealjs
+editor: visual
+slide-number: true
+---
+
+# Introduction
+
+This paper asks what role taxation can or might play in reducing high levels of inequality in low- and middle-income countries. Are policy instruments like the personal income tax or value-added tax used in similar ways as in high-income plots countries’ tax characteristics as a function of their development level, for which we use GDP per capita as a proxy(Bachas et al., 2024).
+
+The authors highlight the challenges of progressive taxation in low- and middle-income countries, focusing on statutory incidence, tax evasion, and economic incidence of taxes .
+
+## Objectives
+
+-   To demonstrate accurate reproducability of Figure 1 from the academic paper provided
+-   To write a report using Quarto and R Markdown
+-   Publish the report as a website through GitHub
+-   Showcase challenges and issues face during replication of result.
+
+## Figure 1
+
+\![Figure1(Tax Systems across the Development Path)](papergraph.png)
+
+-   The figure depicts how the total share of GDP collected in taxes evolves from lower-income to higher-income countries.
+-   Total Tax Revenue: Increases with economic development, indicating higher tax collection capabilities in wealthier countries.
+
+## Dataset
+
+-   The data for Figure 1 was compiled from various primary micro-datasets, which are detailed in the "Cross-Country Data" sheet of the "Data Sources" document in the replication package.
+-   This dataset is created by running the `Master_cross_country.do` file, which harmonizes income and employment variables and merges them with other relevant datasets(Bachas et al., 2024).
+
+## Dataset
+
+-   The dataset includes 132 countries with populations over one million and excludes those where revenue from oil and gas exceeds one-third of GDP. This sample covers 93 percent of the world's population. The data for 2018 were compiled from various sources, including individual countries' government archives, the OECD, and UNU-WIDER/ICTD which were compiled into "Master_crosscty.dta" (Bachas et al., 2024).
+
+## Dataset
+
+Variables used from dataset
+
+-   gdp_pc, ndp_usd = GDP per Capita
+
+-   pct_tax, relyear_incometax = Total Tax Revenue
+
+## Code
+
+-   Install packages, load libraries
+
+-   Set working directory and input dataset
+
+```{r}
+#| echo: True
+#| code-line-numbers: "|1|2|3|5|6|7-8"
+
+if (!require(pacman)) install.packages("pacman")
+suppressMessages(pacman::p_unload(all))
+pacman::p_load(tidyverse,haven,dplyr)
+
+setwd("C:/HSF/data sciene/final")
+data2 <- read_dta("Master_crosscty.dta")
+data <- read_csv("globalETR_bfjz.csv")
+```
+
+## Code
+
+Mutate data to preferred variables
+
+```{r}
+#| echo: True
+#| code-line-numbers: "|1|2|3"
+data <- data %>%
+  mutate(GDP_per_capita = ndp_usd / 1000000,
+         Total_Tax_Revenue = pct_tax
+         )
+
+```
+
+```         
+```
+
+## Code
+
+Plot Graph
+
+```{r}
+#| echo: true
+#| eval: true
+#| include: true
+#| code-line-numbers: "|1|2|3|4-8|9-13"
+plot <- ggplot(data, aes(x = GDP_per_capita, y = pct_tax)) +
+  geom_point() +
+  scale_x_log10() +  
+  labs(
+    title = "Total tax revenue (excl. SSC)",
+    x = "GDP per capita (constant 2010 US dollars, log scale)",
+    y = "Share of GDP"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    legend.position = "bottom"
+  )
+```
+
+## Code
+
+```{r}
+#| eval: true
+#| echo: true
+#| fig.width: 10
+#| fig.height: 5
+
+plot
+```
+
+## Using Master_crosscty data package
+
+```{r}
+#| eval: true
+data2 <- read_dta("Master_crosscty.dta")
+data2 <- data2 %>%
+  filter(!is.na(gdp_pc) & !is.na(relyear_incometax)) %>%
+  mutate(GDP_per_capita = gdp_pc,
+         Total_Tax_Revenue = relyear_incometax)
+plot2 <- ggplot(data2, aes(x = GDP_per_capita, y = Total_Tax_Revenue)) +
+  geom_point() +
+  scale_x_log10() + 
+  labs(
+    title = "Total tax revenue (excl. SSC)",
+    x = "GDP per capita (constant 2010 US dollars, log scale)",
+    y = "Share of GDP"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    legend.position = "bottom"
+  )
+
+```
+
+```{r}
+#| eval: true
+#| echo: true
+#| fig.width: 10
+#| fig.height: 5
+
+plot2
+```
+
+## Challenges
+
+-   Familiarizing with the dataset, understanding the variables, and their significance.
+
+-   Dealing with missing values in the dataset and filtering.
+
+-   Exact points not being depicted as shown in the result given on the paper.
+
+-   Faced many issues while pushing the presentation to Github.
+
+## References
+
+Pierre Bachas, Anders Jensen, and Lucie Gadenne. Tax equity in low- and middle-income countries. Journal of Economic Perspectives, 38(1):55–80, February 2024. doi: 10.1257/jep. 38.1.55. URL <https://www.aeaweb.org/articles?id=10.1257/jep.38.1.55.>
+
+Bachas, Pierre, Matthew H. Fisher-Post, Anders Jensen, and Gabriel Zucman. 2022c. “Database for: Globalization and Factor Income Taxation.” NBER Working Paper 29819. https://globaltaxation. world
